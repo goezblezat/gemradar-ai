@@ -1,0 +1,68 @@
+import requests
+from scanner.database_writer import save_token
+
+
+URL = "https://api.dexscreener.com/latest/dex/search?q=SOL"
+
+
+def get_tokens():
+
+    response = requests.get(URL, timeout=10)
+
+    if response.status_code != 200:
+        print("❌ Failed to connect")
+        return
+
+    data = response.json()
+
+    print("=" * 40)
+    print("🚀 GemRadar DexScreener")
+    print("=" * 40)
+
+    pairs = data.get("pairs", [])
+
+    if not pairs:
+        print("No tokens found")
+        return
+
+
+    for pair in pairs[:10]:
+
+        base = pair.get("baseToken", {})
+        liquidity = pair.get("liquidity", {})
+        volume = pair.get("volume", {})
+
+        address = base.get("address")
+        symbol = base.get("symbol")
+        name = base.get("name")
+
+        price = pair.get("priceUsd") or 0
+        liquidity_usd = liquidity.get("usd") or 0
+        volume24 = volume.get("h24") or 0
+        fdv = pair.get("fdv") or 0
+
+
+        print("=" * 40)
+        print("Token      :", symbol)
+        print("Name       :", name)
+        print("Liquidity  :", liquidity_usd)
+        print("Volume 24h :", volume24)
+        print("FDV        :", fdv)
+
+
+        save_token(
+            address,
+            name,
+            symbol,
+            price,
+            liquidity_usd,
+            volume24,
+            0,
+            0,
+            fdv,
+            "DexScreener"
+        )
+
+
+if __name__ == "__main__":
+    get_tokens()

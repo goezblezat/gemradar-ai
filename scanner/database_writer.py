@@ -9,7 +9,9 @@ def save_token(
     liquidity=0,
     volume_24h=0,
     holders=0,
-    ai_score=0
+    ai_score=0,
+    fdv=0,
+    source="DexScreener"
 ):
 
     connection = connect_database()
@@ -28,11 +30,19 @@ def save_token(
             liquidity,
             volume_24h,
             holders,
-            ai_score
+            ai_score,
+            fdv,
+            source
         )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+
         ON CONFLICT (address)
-        DO NOTHING;
+        DO UPDATE SET
+            price = EXCLUDED.price,
+            liquidity = EXCLUDED.liquidity,
+            volume_24h = EXCLUDED.volume_24h,
+            fdv = EXCLUDED.fdv,
+            source = EXCLUDED.source;
         """
 
         cursor.execute(
@@ -45,7 +55,9 @@ def save_token(
                 liquidity,
                 volume_24h,
                 holders,
-                ai_score
+                ai_score,
+                fdv,
+                source
             )
         )
 
@@ -67,5 +79,7 @@ if __name__ == "__main__":
         10000,
         50000,
         100,
-        75
+        70,
+        50000,
+        "Test"
     )
