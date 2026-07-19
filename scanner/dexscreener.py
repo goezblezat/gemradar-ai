@@ -3,6 +3,7 @@ import requests
 
 from ai.filter import analyze_token
 from ai.meme_detector import check_token
+from ai.gem_score import calculate_gem_score
 from scanner.database_writer import save_token
 
 
@@ -70,7 +71,15 @@ def get_tokens():
 
         ai_score = analysis["score"]
         risk_level = analysis["risk"]
+        gem_analysis = calculate_gem_score(
+            liquidity_usd,
+            volume24,
+            fdv,
+            risk_level
+        )
 
+        gem_score = gem_analysis["gem_score"]
+        gem_status = gem_analysis["status"]
 
         print("=" * 40)
         print("Token      :", symbol)
@@ -80,7 +89,8 @@ def get_tokens():
         print("FDV        :", fdv)
         print("AI Score   :", ai_score)
         print("Risk       :", risk_level)
-
+        print("Gem Score  :", gem_score)
+        print("Status     :", gem_status)
 
         save_token(
             address,
