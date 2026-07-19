@@ -1,22 +1,26 @@
-BLACKLIST = [
-    "SOL",
-    "USDC",
-    "USDT",
-    "ETH",
-    "WETH",
-    "BTC"
+BLUE_CHIPS = [
+    "SOLANA",
+    "WRAPPED SOL",
+    "USD COIN",
+    "TETHER",
+    "ETHEREUM",
+    "BITCOIN"
 ]
 
 
 def check_token(symbol, name):
 
-    symbol = symbol.upper()
+    symbol = (symbol or "").upper()
+    name = (name or "").upper()
 
-    if symbol in BLACKLIST:
-        return {
-            "is_meme": False,
-            "reason": "Blue chip token"
-        }
+
+    for coin in BLUE_CHIPS:
+        if coin in name:
+            return {
+                "is_meme": False,
+                "reason": "Blue chip token"
+            }
+
 
     return {
         "is_meme": True,

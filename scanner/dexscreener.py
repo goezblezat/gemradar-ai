@@ -1,6 +1,8 @@
+
 import requests
 
 from ai.filter import analyze_token
+from ai.meme_detector import check_token
 from scanner.database_writer import save_token
 
 
@@ -30,17 +32,24 @@ def get_tokens():
         print("No tokens found")
         return
 
-
     for pair in pairs[:10]:
 
         base = pair.get("baseToken", {})
         liquidity = pair.get("liquidity", {})
         volume = pair.get("volume", {})
 
-
         address = base.get("address")
         symbol = base.get("symbol")
         name = base.get("name")
+
+        meme_check = check_token(
+            symbol,
+            name
+        )
+
+        if not meme_check["is_meme"]:
+            print("❌ SKIP:", name, "-", meme_check["reason"])
+            continue
 
         price = float(pair.get("priceUsd") or 0)
 
