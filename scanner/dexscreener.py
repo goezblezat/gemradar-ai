@@ -1,4 +1,6 @@
 import requests
+
+from ai.filter import analyze_token
 from scanner.database_writer import save_token
 
 
@@ -13,13 +15,16 @@ def get_tokens():
         print("❌ Failed to connect")
         return
 
+
     data = response.json()
 
     print("=" * 40)
     print("🚀 GemRadar DexScreener")
     print("=" * 40)
 
+
     pairs = data.get("pairs", [])
+
 
     if not pairs:
         print("No tokens found")
@@ -32,14 +37,30 @@ def get_tokens():
         liquidity = pair.get("liquidity", {})
         volume = pair.get("volume", {})
 
+
         address = base.get("address")
         symbol = base.get("symbol")
         name = base.get("name")
 
-        price = pair.get("priceUsd") or 0
-        liquidity_usd = liquidity.get("usd") or 0
-        volume24 = volume.get("h24") or 0
-        fdv = pair.get("fdv") or 0
+        price = float(pair.get("priceUsd") or 0)
+
+        liquidity_usd = float(liquidity.get("usd") or 0)
+
+        volume24 = float(volume.get("h24") or 0)
+
+        fdv = float(pair.get("fdv") or 0)
+
+
+        analysis = analyze_token(
+            symbol,
+            liquidity_usd,
+            volume24,
+            fdv
+        )
+
+
+        ai_score = analysis["score"]
+        risk_level = analysis["risk"]
 
 
         print("=" * 40)
@@ -48,6 +69,8 @@ def get_tokens():
         print("Liquidity  :", liquidity_usd)
         print("Volume 24h :", volume24)
         print("FDV        :", fdv)
+        print("AI Score   :", ai_score)
+        print("Risk       :", risk_level)
 
 
         save_token(
@@ -58,9 +81,10 @@ def get_tokens():
             liquidity_usd,
             volume24,
             0,
-            0,
+            ai_score,
             fdv,
-            "DexScreener"
+            "DexScreener",
+            risk_level
         )
 
 
