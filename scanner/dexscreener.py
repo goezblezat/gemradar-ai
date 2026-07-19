@@ -103,7 +103,9 @@ def get_tokens():
             ai_score,
             fdv,
             "DexScreener",
-            risk_level
+            risk_level,
+            gem_score,
+            gem_status
         )
 
 

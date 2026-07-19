@@ -11,8 +11,10 @@ def save_token(
     holders=0,
     ai_score=0,
     fdv=0,
-    source="DexScreener",
-    risk_level="UNKNOWN"
+        source="DexScreener",
+    risk_level="UNKNOWN",
+    gem_score=0,
+    gem_status="UNKNOWN"
 ):
 
     connection = connect_database()
@@ -33,10 +35,12 @@ def save_token(
             holders,
             ai_score,
             fdv,
-            source,
-            risk_level
+                        source,
+            risk_level,
+            gem_score,
+            gem_status
         )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 
         ON CONFLICT (address)
         DO UPDATE SET
@@ -46,7 +50,9 @@ def save_token(
             ai_score = EXCLUDED.ai_score,
             fdv = EXCLUDED.fdv,
             source = EXCLUDED.source,
-            risk_level = EXCLUDED.risk_level;
+            risk_level = EXCLUDED.risk_level,
+gem_score = EXCLUDED.gem_score,
+            gem_status = EXCLUDED.gem_status;
         """
 
         cursor.execute(
@@ -62,7 +68,9 @@ def save_token(
                 ai_score,
                 fdv,
                 source,
-                risk_level
+                risk_level,
+gem_score,
+                gem_status
             )
         )
 
@@ -87,5 +95,7 @@ if __name__ == "__main__":
         70,
         50000,
         "Test",
-        "LOW"
+        "LOW",
+ 65,
+        "WATCHLIST"
     )
