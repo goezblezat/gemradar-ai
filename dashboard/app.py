@@ -46,21 +46,43 @@ LIMIT 10;
 df = pd.read_sql(query, conn)
 
 st.title("💎 GemRadar AI")
-st.subheader("Top 10 Meme Coins")
+st.caption("AI Meme Coin Scanner")
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric("Total Tokens", len(df))
+    st.metric("📦 Total Tokens", len(df))
 
 with col2:
-    watchlist = len(df[df["gem_status"].fillna("").str.contains("WATCHLIST")])
-    st.metric("Watchlist", watchlist)
+    watchlist = len(
+        df[df["gem_status"].fillna("").str.contains("WATCHLIST")]
+    )
+    st.metric("👀 Watchlist", watchlist)
 
 with col3:
     hot = len(df[df["gem_score"].fillna(0) >= 80])
-    st.metric("Hot Gems", hot)
+    st.metric("🔥 Hot Gems", hot)
+
+with col4:
+    avg_ai = round(df["ai_score"].fillna(0).mean(), 1)
+    st.metric("🤖 Avg AI", avg_ai)
 
 st.divider()
+search = st.text_input(
+    "🔍 Search Token",
+    placeholder="Contoh: SOL atau Tomato"
+)
 
-st.dataframe(df, use_container_width=True)
+if search:
+    df = df[
+        df["name"].str.contains(search, case=False, na=False)
+        |
+        df["symbol"].str.contains(search, case=False, na=False)
+    ]
+st.subheader("📋 Top Meme Coins")
+
+st.dataframe(
+    df,
+    use_container_width=True,
+    hide_index=True
+)
